@@ -69,6 +69,7 @@ public class ColorHighlighter {
 	}
 	public void highlight(JTextPane textPane, Theme theme) {
 		try {
+			int selectionStart = textPane.getSelectionStart(); int selectionEnd = textPane.getSelectionEnd(); // stores the selection for later
 			int caretPosition = textPane.getCaretPosition(); // stores the starting caret position for later
 			clearColors(); // clear the text of any coloring every everytime before applying colors again
 			
@@ -88,6 +89,7 @@ public class ColorHighlighter {
 			colorFromTo("/\\*", "\\*/", theme.commentColor);
 			
 			textPane.setCaretPosition(caretPosition); //puts the caret to starting position | otherwise the caret would end up at last color change point as colorString() uses selection for coloring
+			textPane.setSelectionStart(selectionStart); textPane.setSelectionEnd(selectionEnd); //puts selection to what it was befor color painting messed it up
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
