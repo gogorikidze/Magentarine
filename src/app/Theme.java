@@ -12,5 +12,5 @@ public class Theme {
 	Color stringColor = new Color(220, 50, 47);
 	Color commentColor = new Color(147, 161, 161);
 	
-	Color errorColor = new Color(255, 0, 255);
+	Color errorColor = new Color(230, 92, 0);
 }

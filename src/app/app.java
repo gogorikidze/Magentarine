@@ -24,6 +24,7 @@ import java.awt.Color;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+import java.awt.Label;
 
 public class app {
 	FileManager fileManager = new FileManager();
@@ -78,7 +79,7 @@ public class app {
 		JTextPane consoleArea = new JTextPane();
 		consoleArea.setForeground(theme.backgroundColor);
 		consoleArea.setBackground(theme.fontColor);
-		consoleArea.setFont(new Font("Lucida Sans Unicode", Font.PLAIN, 13));
+		consoleArea.setFont(new Font("Lucida Sans Unicode", Font.PLAIN, 11));
 		consoleArea.setToolTipText("none");
 		consoleArea.setEditable(false);
 		consoleArea.setBounds(0, 120, WindowFrame.getWidth(), 150);
@@ -102,6 +103,12 @@ public class app {
 		Console console = new Console(consoleArea);
 		Scripter scripter = new Scripter(console, textPane);
 		
+		Label nashornEngineVersion = new Label("Nashorn Engine");
+		nashornEngineVersion.setBounds(0, 120, 584, 12);
+		WindowFrame.getContentPane().add(nashornEngineVersion);
+		
+		nashornEngineVersion.setText("Nashorn Engine (v" + Scripter.engine.getFactory().getEngineVersion() + ") output:");
+		
 		textPane.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				scripter.executeAndOutput(textPane.getText(), theme.errorColor);
@@ -113,10 +120,11 @@ public class app {
 			public void componentResized(ComponentEvent arg0) {
 				int headerHeight = 0;
 				int consoleHeight = 150;
-				int editorHeight = WindowFrame.getContentPane().getHeight() - consoleHeight - headerHeight;
+				int editorHeight = WindowFrame.getContentPane().getHeight() - consoleHeight - headerHeight - nashornEngineVersion.getHeight();
 				
+				nashornEngineVersion.setBounds(0, headerHeight+editorHeight, WindowFrame.getWidth(), nashornEngineVersion.getHeight());
 				scrollPane.setBounds(0, headerHeight, WindowFrame.getWidth()-15, editorHeight);
-				consoleScrollPane.setBounds(0, headerHeight + editorHeight, WindowFrame.getWidth()-15, consoleHeight);
+				consoleScrollPane.setBounds(0, headerHeight + editorHeight+ nashornEngineVersion.getHeight(), WindowFrame.getWidth()-15, consoleHeight);
 				
 				consoleScrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
 				scrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
