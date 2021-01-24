@@ -18,6 +18,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 
 import javax.swing.UIManager;
+import javax.swing.undo.UndoManager;
 
 import java.awt.Window.Type;
 import java.awt.Color;
@@ -32,6 +33,7 @@ public class app {
     ColorHighlighter highlighter;
     Console console;
     Theme theme = new Theme();
+    UndoManager undoManager;
 	
 	private JFrame WindowFrame;
 	public static void main(String[] args) {
@@ -66,6 +68,9 @@ public class app {
 		textPane.setBackground(theme.backgroundColor);
 		textPane.setBounds(0, 20, WindowFrame.getWidth(), 100);
 		textPane.setMargin(new Insets(0,5,0,5));
+		
+		undoManager = new UndoManager();
+		textPane.getDocument().addUndoableEditListener(undoManager);
 		
 		JScrollPane scrollPane = new JScrollPane(textPane);
 		scrollPane.setBounds(0, 20, WindowFrame.getWidth(), 100);
@@ -136,8 +141,12 @@ public class app {
 		});
 	}
 	void topMenuSetup(JTextPane textPane){
+		JMenuBar menuBar = new JMenuBar();
+		WindowFrame.setJMenuBar(menuBar);
+		
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setBounds(294, 0, 67, 22);
+		menuBar.add(fileMenu);
 		
 		JMenuItem saveItem = new JMenuItem("Save");
 		saveItem.addActionListener(new ActionListener() {
@@ -159,8 +168,27 @@ public class app {
 		});
 		fileMenu.add(openItem);
 		
-		JMenuBar menuBar = new JMenuBar();
-		menuBar.add(fileMenu);
-		WindowFrame.setJMenuBar(menuBar);
+		//Edit menu
+		JMenu editMenu = new JMenu("Edit");
+		editMenu.setBounds(20, 0, 67, 22);
+		menuBar.add(editMenu);
+		
+		JMenuItem undoItem = new JMenuItem("Undo");
+		undoItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				undoManager.undo();
+			}
+		});
+		editMenu.add(undoItem);
+		
+		JMenuItem redoItem = new JMenuItem("Redo");
+		redoItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				undoManager.redo();
+			}
+		});
+		editMenu.add(redoItem);
 	}
 }
