@@ -18,6 +18,7 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 
 import javax.swing.UIManager;
+
 import java.awt.Window.Type;
 import java.awt.Color;
 

@@ -1,6 +1,7 @@
 package app;
 
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
@@ -41,53 +42,54 @@ public class ColorHighlighter {
 	public AttributeSet colorToAS(Color color) { //creates Attributeset from [Color.color]
 		return styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, color);
 	}
-	public void highlightGroup(ArrayList<String> toHighLight, Color color) { // applies color to
+	public void highlightGroup(ArrayList<String> toHighLight, Color color) throws BadLocationException { // applies color to
 		for(int i = 0; i < toHighLight.size(); i++) {
-			ArrayList<Integer> indexes = indexFinder.getIndexes(textPane.getText(), toHighLight.get(i));
+			ArrayList<Integer> indexes = indexFinder.getIndexes(textPane.getDocument().getText(0, textPane.getDocument().getLength()), toHighLight.get(i));
 			for(int ii = 0; ii < indexes.size(); ii++) {
-				int linecount = indexFinder.getCount(textPane.getText().substring(0, indexes.get(ii)), "\n");
-				colorString(indexes.get(ii) - linecount, indexes.get(ii)+toHighLight.get(i).length() - linecount, colorToAS(color));
+				colorString(indexes.get(ii), indexes.get(ii)+toHighLight.get(i).length(), colorToAS(color));
 			}
 		}
 	}
-	public void colorFromTo(String from, String to, Color color, boolean DoNewlinesCount, int startoffset, int endoffset) {
+	public void colorFromTo(String from, String to, Color color, boolean DoNewlinesCount, int startoffset, int endoffset) throws BadLocationException {
 		//colors from [string] to [string], [DoNewlineCount] dictates if regex can detect on multiple lines.
 		//on startoffset -1 '$string%' will rerturn '$string', on 0 it will return 'string', on 1 it will only return 'tring'
 		//on startoffset -1 '$string%' will rerturn 'strin', on 0 it will return 'string', on 1 it will only return 'string%'
-		ArrayList<int[]> indexes = indexFinder.findFromTo(textPane.getText(), from, to, DoNewlinesCount, startoffset, endoffset);
+		ArrayList<int[]> indexes = indexFinder.findFromTo(textPane.getDocument().getText(0, textPane.getDocument().getLength()), from, to, DoNewlinesCount, startoffset, endoffset);
 		for(int i = 0; i < indexes.size(); i++) {
-			int firstlinecount = indexFinder.getCount(textPane.getText().substring(0, indexes.get(i)[0]), "\n");
-			int lastlinecount = indexFinder.getCount(textPane.getText().substring(0, indexes.get(i)[1]), "\n");
-			colorString(indexes.get(i)[0] - firstlinecount, indexes.get(i)[1] - lastlinecount, colorToAS(color));
+			colorString(indexes.get(i)[0], indexes.get(i)[1], colorToAS(color));
 		}
 	}
-	public void colorFromTo(String from, String to, Color color) {
+	public void colorFromTo(String from, String to, Color color) throws BadLocationException {
 		colorFromTo(from, to, color, true, 0, 0);
 	}
-	public void highlightMeasurements(ArrayList<String> toHighLight, Color color) {
+	public void highlightMeasurements(ArrayList<String> toHighLight, Color color) throws BadLocationException {
 		for(int i = 0; i < toHighLight.size(); i++) {
 			colorFromTo("\\W", toHighLight.get(i), color);
 		}
 	}
 	public void highlight(JTextPane textPane, Theme theme) {
-		int caretPosition = textPane.getCaretPosition(); // stores the starting caret position for later
-		clearColors(); // clear the text of any coloring every everytime before applying colors again
-		
-		colorFromTo("\\.", "\\W", theme.propertyColor, false, 0, -1);
-		
-		//applies colors to specific words if they turn out to be in structure of [\\w]term[\\w]
-		ArrayList<String> keywords = new ArrayList<String>(Arrays.asList("Console","console","await","break","case","catch","class","const","continue","debugger","default","delete","do","else","enum","export","extends","false","finally","for","function","if","implements","import","in","instanceof","interface","let","new","null","package","private","protected","public","return","super","switch","static","this","throw","try","True","typeof","var","void","while","with","yield"));
-		
-		highlightGroup(keywords, theme.keywordColor);
-		
-		//colors strings
-		colorFromTo("\"", "\"", theme.stringColor);
-		colorFromTo("\'", "\'", theme.stringColor);
-		
-		//colors comments
-		colorFromTo("//", "\n", theme.commentColor);
-		colorFromTo("/\\*", "\\*/", theme.commentColor);
-		
-		textPane.setCaretPosition(caretPosition); //puts the caret to starting position | otherwise the caret would end up at last color change point as colorString() uses selection for coloring
+		try {
+			int caretPosition = textPane.getCaretPosition(); // stores the starting caret position for later
+			clearColors(); // clear the text of any coloring every everytime before applying colors again
+			
+			colorFromTo("\\.", "\\W", theme.propertyColor, false, 0, -1);
+			
+			//applies colors to specific words if they turn out to be in structure of [\\w]term[\\w]
+			ArrayList<String> keywords = new ArrayList<String>(Arrays.asList("Console","console","await","break","case","catch","class","const","continue","debugger","default","delete","do","else","enum","export","extends","false","finally","for","function","if","implements","import","in","instanceof","interface","let","new","null","package","private","protected","public","return","super","switch","static","this","throw","try","True","typeof","var","void","while","with","yield"));
+			
+			highlightGroup(keywords, theme.keywordColor);
+			
+			//colors strings
+			colorFromTo("\"", "\"", theme.stringColor);
+			colorFromTo("\'", "\'", theme.stringColor);
+			
+			//colors comments
+			//colorFromTo("//", "\n", theme.commentColor);
+			colorFromTo("/\\*", "\\*/", theme.commentColor);
+			
+			textPane.setCaretPosition(caretPosition); //puts the caret to starting position | otherwise the caret would end up at last color change point as colorString() uses selection for coloring
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 	}
 }
