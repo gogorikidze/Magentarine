@@ -18,15 +18,19 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.undo.UndoManager;
 
 import java.awt.Window.Type;
 import java.awt.Color;
+import java.awt.Dimension;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import java.awt.Label;
+import javax.swing.JTextArea;
 
 public class app {
 	FileManager fileManager = new FileManager();
@@ -51,7 +55,7 @@ public class app {
 	public app() {
 		initialize();
 	}
-	private void initialize() {
+	public void initialize() {
 		WindowFrame = new JFrame();
 		WindowFrame.setType(Type.POPUP);
 		WindowFrame.setFont(UIManager.getFont("Button.font"));
@@ -63,17 +67,17 @@ public class app {
 		WindowFrame.getContentPane().setBackground(new Color(245,245,245));
 		
 		JTextPane textPane = new JTextPane();
-		textPane.setFont(new Font("Lucida Sans Unicode", Font.BOLD, 14));
+		textPane.setFont(new Font("Lucida Sans Unicode", Font.BOLD, 13));
 		textPane.setForeground(theme.fontColor);
 		textPane.setBackground(theme.backgroundColor);
-		textPane.setBounds(0, 20, WindowFrame.getWidth(), 100);
+		textPane.setBounds(0, 0, WindowFrame.getWidth() - 20, 100);
 		textPane.setMargin(new Insets(0,5,0,5));
 		
 		undoManager = new UndoManager();
 		textPane.getDocument().addUndoableEditListener(undoManager);
 		
 		JScrollPane scrollPane = new JScrollPane(textPane);
-		scrollPane.setBounds(0, 20, WindowFrame.getWidth(), 100);
+		scrollPane.setBounds(20, 0, WindowFrame.getWidth() - 20, 100);
 		WindowFrame.getContentPane().add(scrollPane);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -81,6 +85,26 @@ public class app {
 		scrollPane.setBackground(theme.backgroundColor);
 		scrollPane.getVerticalScrollBar().setOpaque(false);
 		scrollPane.setBorder(BorderFactory.createLineBorder(null, 0));
+		
+		
+		JTextArea lineDisplay = new JTextArea();
+		lineDisplay.setEditable(false);
+		lineDisplay.setMargin(new Insets(0,5,0,5));
+		lineDisplay.setFont(new Font("Lucida Sans Unicode", Font.PLAIN, 13));
+		lineDisplay.setForeground(theme.fontColor);
+		lineDisplay.setBackground(theme.backgroundColor);
+		lineDisplay.setText("1");
+		lineDisplay.setSize(new Dimension(Math.max(lineDisplay.getPreferredSize().width, 20), lineDisplay.getWidth()));
+		
+		JScrollPane lineScrollPane = new JScrollPane(lineDisplay);
+		lineScrollPane.setBounds(0, 0, 20, 100);
+		WindowFrame.getContentPane().add(lineScrollPane);
+		lineScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		lineScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		lineScrollPane.setBackground(theme.backgroundColor);
+		lineScrollPane.getVerticalScrollBar().setOpaque(false);
+		lineScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, theme.fontColor));
+		lineScrollPane.getVerticalScrollBar().setModel(scrollPane.getVerticalScrollBar().getModel());
 		
 		JTextPane consoleArea = new JTextPane();
 		consoleArea.setForeground(theme.backgroundColor);
@@ -90,7 +114,6 @@ public class app {
 		consoleArea.setEditable(false);
 		consoleArea.setBounds(0, 120, WindowFrame.getWidth(), 150);
 		consoleArea.setMargin(new Insets(3,20,0,20));
-		//consoleArea.getDocument().addDocumentListener(new LimitLinesDocumentListener(6));
 		
 		JScrollPane consoleScrollPane = new JScrollPane(consoleArea);
 		consoleScrollPane.setBounds(0, 120, WindowFrame.getWidth(), 150);
@@ -122,23 +145,40 @@ public class app {
 			}
 		});
 		
-		WindowFrame.addComponentListener(new ComponentListener() {
+		ComponentListener windowComponentListener = new ComponentListener(){
 			public void componentResized(ComponentEvent arg0) {
-				int headerHeight = 0;
-				int consoleHeight = 150;
-				int editorHeight = WindowFrame.getContentPane().getHeight() - consoleHeight - headerHeight - nashornEngineVersion.getHeight();
-				
-				nashornEngineVersion.setBounds(0, headerHeight+editorHeight, WindowFrame.getWidth(), nashornEngineVersion.getHeight());
-				scrollPane.setBounds(0, headerHeight, WindowFrame.getWidth()-15, editorHeight);
-				consoleScrollPane.setBounds(0, headerHeight + editorHeight+ nashornEngineVersion.getHeight(), WindowFrame.getWidth()-15, consoleHeight);
-				
-				consoleScrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
-				scrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
-	        }
-			@Override public void componentHidden(ComponentEvent e) {}
-			@Override public void componentMoved(ComponentEvent e) {}
-			@Override public void componentShown(ComponentEvent e) {}
+				resize(nashornEngineVersion,lineScrollPane,lineDisplay,scrollPane,consoleScrollPane);
+		    }@Override public void componentHidden(ComponentEvent e) {}@Override public void componentMoved(ComponentEvent e) {}@Override public void componentShown(ComponentEvent e) {}
+		};
+		WindowFrame.addComponentListener(windowComponentListener);
+		
+		textPane.getDocument().addDocumentListener(new DocumentListener(){
+			@Override public void changedUpdate(DocumentEvent arg0) {
+				String text = textPane.getText();
+				String lineText = "1";
+				int linecount = text.length() - text.replaceAll("\n", "").length() + 1;
+				for(int i = 1; i < linecount; i++) {
+					lineText += "\n" + (i+1);
+				}
+				lineDisplay.setText(lineText);
+				resize(nashornEngineVersion,lineScrollPane,lineDisplay,scrollPane,consoleScrollPane);
+			}
+			@Override public void insertUpdate(DocumentEvent arg0) {}@Override public void removeUpdate(DocumentEvent arg0) {}
 		});
+	}
+	void resize(Label nashornEngineVersion, JScrollPane lineScrollPane, JTextArea lineDisplay, JScrollPane scrollPane, JScrollPane consoleScrollPane) {
+		int headerHeight = 0;
+		int consoleHeight = 150;
+		int editorHeight = WindowFrame.getContentPane().getHeight() - consoleHeight - headerHeight - nashornEngineVersion.getHeight();
+		
+		nashornEngineVersion.setBounds(0, headerHeight+editorHeight, WindowFrame.getWidth(), nashornEngineVersion.getHeight());
+		lineDisplay.setSize(Math.max(20, lineDisplay.getPreferredSize().width), lineDisplay.getHeight());
+		lineScrollPane.setBounds(0, headerHeight, lineDisplay.getWidth(), editorHeight);
+		scrollPane.setBounds(lineScrollPane.getWidth(), headerHeight, WindowFrame.getWidth()-15 - lineScrollPane.getWidth(), editorHeight);
+		consoleScrollPane.setBounds(0, headerHeight + editorHeight+ nashornEngineVersion.getHeight(), WindowFrame.getWidth()-15, consoleHeight);
+		
+		consoleScrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
+		scrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
 	}
 	void topMenuSetup(JTextPane textPane){
 		JMenuBar menuBar = new JMenuBar();
@@ -151,8 +191,7 @@ public class app {
 		
 		JMenuItem saveItem = new JMenuItem("Save");
 		saveItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				fileManager.save(textPane);
 				highlighter.highlight(textPane, theme);
 			}
@@ -161,8 +200,7 @@ public class app {
 		
 		JMenuItem openItem = new JMenuItem("Open");
 		openItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				fileManager.open(textPane);
 				highlighter.highlight(textPane, theme);
 			}
@@ -171,8 +209,7 @@ public class app {
 		
 		JMenuItem exitItem = new JMenuItem("Exit");
 		exitItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				WindowFrame.dispose();
 			}
 		});
@@ -185,8 +222,7 @@ public class app {
 		
 		JMenuItem undoItem = new JMenuItem("Undo");
 		undoItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				undoManager.undo();
 			}
 		});
@@ -194,8 +230,7 @@ public class app {
 		
 		JMenuItem redoItem = new JMenuItem("Redo");
 		redoItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				undoManager.redo();
 			}
 		});
@@ -203,8 +238,7 @@ public class app {
 		
 		JMenuItem copyItem = new JMenuItem("Copy");
 		copyItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				textPane.copy();
 			}
 		});
@@ -212,8 +246,7 @@ public class app {
 		
 		JMenuItem pasteItem = new JMenuItem("Paste");
 		pasteItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				textPane.paste();
 			}
 		});
@@ -221,8 +254,7 @@ public class app {
 		
 		JMenuItem cutItem = new JMenuItem("Cut");
 		cutItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				textPane.cut();
 			}
 		});
@@ -230,8 +262,7 @@ public class app {
 		
 		JMenuItem selectAllItem = new JMenuItem("Select All");
 		selectAllItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				textPane.selectAll();
 			}
 		});

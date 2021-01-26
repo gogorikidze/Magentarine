@@ -7,6 +7,7 @@ import javax.swing.JTextPane;
 public class Console {
 	JTextPane pane;
 	ColorHighlighter highlighter;
+	Theme theme = new Theme();
 	
 	public Console(JTextPane consolePane) {
 		pane = consolePane;
@@ -17,6 +18,6 @@ public class Console {
 		highlighter.colorString(0, pane.getText().length(), highlighter.colorToAS(color));
 	}
 	public void displayLine(String line) {
-		pane.setText(line);
+		displayLine(line, theme.backgroundColor);
 	}
 }
