@@ -15,7 +15,7 @@ public class FileManager {
 	public FileManager() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}catch(Exception e){
+		}catch(Exception e) {
 			
 		}
 	}
@@ -36,7 +36,6 @@ public class FileManager {
 	    			while((r=reader.read())!=-1){  
 	    				file += (char)r;
 	    			}
-	    			System.out.print(file);
 	    			editorPane.setText(file);
 	    		}catch(Exception e) {
 	    			System.out.print("Error wih reading"+e);

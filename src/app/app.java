@@ -18,8 +18,6 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 
 import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.undo.UndoManager;
 
 import java.awt.Window.Type;
@@ -72,6 +70,10 @@ public class app {
 		textPane.setBackground(theme.backgroundColor);
 		textPane.setBounds(0, 0, WindowFrame.getWidth() - 20, 100);
 		textPane.setMargin(new Insets(0,5,0,5));
+		
+		JTextPane bufferPane = new JTextPane();
+		textPane.setBounds(0, 0, 0, 0);
+		WindowFrame.getContentPane().add(bufferPane);
 		
 		undoManager = new UndoManager();
 		textPane.getDocument().addUndoableEditListener(undoManager);
@@ -133,7 +135,7 @@ public class app {
 		
 		topMenuSetup(textPane);
 		
-		highlighter = new ColorHighlighter(textPane);
+		highlighter = new ColorHighlighter(textPane, bufferPane);
 		Console console = new Console(consoleArea);
 		Scripter scripter = new Scripter(console, textPane);
 		
@@ -146,7 +148,7 @@ public class app {
 		textPane.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				scripter.executeAndOutput(textPane.getText(), theme.errorColor);
-				//highlighter.highlight(textPane, theme);
+				highlighter.highlight(textPane, theme);
 			}
 		});
 		

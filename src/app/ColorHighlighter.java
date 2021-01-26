@@ -18,8 +18,17 @@ public class ColorHighlighter {
 	StyleContext styleContext;
 	AttributeSet mainTextColor;
 	JTextPane textPane;
+	JTextPane bufferPane;
 	
 	
+	public ColorHighlighter(JTextPane textPaneToSet, JTextPane bufferPaneToSet) {
+		styleContext = StyleContext.getDefaultStyleContext();
+		
+		textPane = textPaneToSet;
+		bufferPane = bufferPaneToSet;
+		textPane.setCaretColor(textPaneToSet.getForeground());
+		mainTextColor = colorToAS(textPaneToSet.getForeground());
+	}
 	public ColorHighlighter(JTextPane textPaneToSet) {
 		styleContext = StyleContext.getDefaultStyleContext();
 		
@@ -81,11 +90,11 @@ public class ColorHighlighter {
 			highlightGroup(keywords, theme.keywordColor);
 			
 			//colors strings
-			colorFromTo("\"", "\"", theme.stringColor);
-			colorFromTo("\'", "\'", theme.stringColor);
+			colorFromTo("\"", "\"", theme.stringColor, false, 0, 0);
+			colorFromTo("\'", "\'", theme.stringColor, false, 0, 0);
 			
 			//colors comments
-			//colorFromTo("//", "\n", theme.commentColor);
+			colorFromTo("//", "\n", theme.commentColor);
 			colorFromTo("/\\*", "\\*/", theme.commentColor);
 			
 			textPane.setCaretPosition(caretPosition); //puts the caret to starting position | otherwise the caret would end up at last color change point as colorString() uses selection for coloring
