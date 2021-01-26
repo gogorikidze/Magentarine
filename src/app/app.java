@@ -96,6 +96,11 @@ public class app {
 		lineDisplay.setText("1");
 		lineDisplay.setSize(new Dimension(Math.max(lineDisplay.getPreferredSize().width, 20), lineDisplay.getWidth()));
 		
+		String lineText = "1";
+		for(int i = 1; i < 5000; i++) { lineText += "\n" + (i+1);}
+		lineDisplay.setText(lineText);
+		lineDisplay.setSize(Math.max(20, lineDisplay.getPreferredSize().width), lineDisplay.getHeight());
+		
 		JScrollPane lineScrollPane = new JScrollPane(lineDisplay);
 		lineScrollPane.setBounds(0, 0, 20, 100);
 		WindowFrame.getContentPane().add(lineScrollPane);
@@ -141,7 +146,7 @@ public class app {
 		textPane.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				scripter.executeAndOutput(textPane.getText(), theme.errorColor);
-				highlighter.highlight(textPane, theme);
+				//highlighter.highlight(textPane, theme);
 			}
 		});
 		
@@ -151,20 +156,6 @@ public class app {
 		    }@Override public void componentHidden(ComponentEvent e) {}@Override public void componentMoved(ComponentEvent e) {}@Override public void componentShown(ComponentEvent e) {}
 		};
 		WindowFrame.addComponentListener(windowComponentListener);
-		
-		textPane.getDocument().addDocumentListener(new DocumentListener(){
-			@Override public void changedUpdate(DocumentEvent arg0) {
-				String text = textPane.getText();
-				String lineText = "1";
-				int linecount = text.length() - text.replaceAll("\n", "").length() + 1;
-				for(int i = 1; i < linecount; i++) {
-					lineText += "\n" + (i+1);
-				}
-				lineDisplay.setText(lineText);
-				resize(nashornEngineVersion,lineScrollPane,lineDisplay,scrollPane,consoleScrollPane);
-			}
-			@Override public void insertUpdate(DocumentEvent arg0) {}@Override public void removeUpdate(DocumentEvent arg0) {}
-		});
 	}
 	void resize(Label nashornEngineVersion, JScrollPane lineScrollPane, JTextArea lineDisplay, JScrollPane scrollPane, JScrollPane consoleScrollPane) {
 		int headerHeight = 0;
@@ -172,7 +163,6 @@ public class app {
 		int editorHeight = WindowFrame.getContentPane().getHeight() - consoleHeight - headerHeight - nashornEngineVersion.getHeight();
 		
 		nashornEngineVersion.setBounds(0, headerHeight+editorHeight, WindowFrame.getWidth(), nashornEngineVersion.getHeight());
-		lineDisplay.setSize(Math.max(20, lineDisplay.getPreferredSize().width), lineDisplay.getHeight());
 		lineScrollPane.setBounds(0, headerHeight, lineDisplay.getWidth(), editorHeight);
 		scrollPane.setBounds(lineScrollPane.getWidth(), headerHeight, WindowFrame.getWidth()-15 - lineScrollPane.getWidth(), editorHeight);
 		consoleScrollPane.setBounds(0, headerHeight + editorHeight+ nashornEngineVersion.getHeight(), WindowFrame.getWidth()-15, consoleHeight);
