@@ -144,6 +144,7 @@ public class app {
 		JMenuBar menuBar = new JMenuBar();
 		WindowFrame.setJMenuBar(menuBar);
 		
+		//File menu
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setBounds(294, 0, 67, 22);
 		menuBar.add(fileMenu);
@@ -168,6 +169,15 @@ public class app {
 		});
 		fileMenu.add(openItem);
 		
+		JMenuItem exitItem = new JMenuItem("Exit");
+		exitItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				WindowFrame.dispose();
+			}
+		});
+		fileMenu.add(exitItem);
+		
 		//Edit menu
 		JMenu editMenu = new JMenu("Edit");
 		editMenu.setBounds(20, 0, 67, 22);
@@ -190,5 +200,41 @@ public class app {
 			}
 		});
 		editMenu.add(redoItem);
+		
+		JMenuItem copyItem = new JMenuItem("Copy");
+		copyItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				textPane.copy();
+			}
+		});
+		editMenu.add(copyItem);
+		
+		JMenuItem pasteItem = new JMenuItem("Paste");
+		pasteItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				textPane.paste();
+			}
+		});
+		editMenu.add(pasteItem);
+		
+		JMenuItem cutItem = new JMenuItem("Cut");
+		cutItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				textPane.cut();
+			}
+		});
+		editMenu.add(cutItem);
+		
+		JMenuItem selectAllItem = new JMenuItem("Select All");
+		selectAllItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				textPane.selectAll();
+			}
+		});
+		editMenu.add(selectAllItem);
 	}
 }
