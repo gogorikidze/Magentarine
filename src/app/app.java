@@ -166,6 +166,7 @@ public class app {
 		
 		nashornEngineVersion.setBounds(0, headerHeight+editorHeight, WindowFrame.getWidth(), nashornEngineVersion.getHeight());
 		lineScrollPane.setBounds(0, headerHeight, lineDisplay.getWidth(), editorHeight);
+		lineDisplay.setSize(new Dimension(Math.max(lineDisplay.getPreferredSize().width, 20), lineDisplay.getWidth()));
 		scrollPane.setBounds(lineScrollPane.getWidth(), headerHeight, WindowFrame.getWidth()-15 - lineScrollPane.getWidth(), editorHeight);
 		consoleScrollPane.setBounds(0, headerHeight + editorHeight+ nashornEngineVersion.getHeight(), WindowFrame.getWidth()-15, consoleHeight);
 		
