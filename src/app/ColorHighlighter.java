@@ -14,11 +14,10 @@ import javax.swing.JTextPane;
 
 public class ColorHighlighter {
 	IndexFinder indexFinder = new IndexFinder();
-	
-	StyleContext styleContext;
-	AttributeSet mainTextColor;
+	private ArrayList<String> keywords = new ArrayList<String>(Arrays.asList("Console","console","await","break","case","catch","class","const","continue","debugger","default","delete","do","else","enum","export","extends","false","finally","for","function","if","implements","import","in","instanceof","interface","let","new","null","package","private","protected","public","return","super","switch","static","this","throw","try","True","typeof","var","void","while","with","yield"));
+	private StyleContext styleContext;
+	private AttributeSet mainTextColor;
 	JTextPane textPane;
-	
 	
 	public ColorHighlighter(JTextPane textPaneToSet) {
 		styleContext = StyleContext.getDefaultStyleContext();
@@ -43,10 +42,10 @@ public class ColorHighlighter {
 		return styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, color);
 	}
 	public void highlightGroup(ArrayList<String> toHighLight, Color color) throws BadLocationException { // applies color to
-		for(int i = 0; i < toHighLight.size(); i++) {
-			ArrayList<Integer> indexes = indexFinder.getIndexes(textPane.getDocument().getText(0, textPane.getDocument().getLength()), toHighLight.get(i));
-			for(int ii = 0; ii < indexes.size(); ii++) {
-				colorString(indexes.get(ii), indexes.get(ii)+toHighLight.get(i).length(), colorToAS(color));
+		for(String item : toHighLight) {
+			ArrayList<Integer> indexes = indexFinder.getIndexes(textPane.getDocument().getText(0, textPane.getDocument().getLength()), item);
+			for(Integer index : indexes) {
+				colorString(index, index+item.length(), colorToAS(color));
 			}
 		}
 	}
@@ -75,17 +74,15 @@ public class ColorHighlighter {
 			
 			colorFromTo("\\.", "\\W", theme.propertyColor, false, 0, -1);
 			
-			//applies colors to specific words if they turn out to be in structure of [\\w]term[\\w]
-			ArrayList<String> keywords = new ArrayList<String>(Arrays.asList("Console","console","await","break","case","catch","class","const","continue","debugger","default","delete","do","else","enum","export","extends","false","finally","for","function","if","implements","import","in","instanceof","interface","let","new","null","package","private","protected","public","return","super","switch","static","this","throw","try","True","typeof","var","void","while","with","yield"));
-			
+			//applies colors to specific words if they turn out to be in structure of [\\w]term[\\w]		
 			highlightGroup(keywords, theme.keywordColor);
 			
 			//colors strings
-			colorFromTo("\"", "\"", theme.stringColor);
-			colorFromTo("\'", "\'", theme.stringColor);
+			colorFromTo("\"", "\"", theme.stringColor, false, 0, 0);
+			colorFromTo("\'", "\'", theme.stringColor, false, 0, 0);
 			
 			//colors comments
-			//colorFromTo("//", "\n", theme.commentColor);
+			colorFromTo("//", "\n", theme.commentColor);
 			colorFromTo("/\\*", "\\*/", theme.commentColor);
 			
 			textPane.setCaretPosition(caretPosition); //puts the caret to starting position | otherwise the caret would end up at last color change point as colorString() uses selection for coloring
@@ -94,4 +91,11 @@ public class ColorHighlighter {
 			e.printStackTrace();
 		}
 	}
+	/*
+	public String customString(int length) {
+		char[] symbols = new char[length];
+		Arrays.fill(symbols, '*');
+		return new String(symbols);
+	}
+	*/
 }

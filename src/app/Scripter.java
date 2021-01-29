@@ -9,18 +9,18 @@ import javax.swing.JTextPane;
 
 public class Scripter {
 	static ScriptEngine engine = new ScriptEngineManager().getEngineByName("Nashorn");
-	static String prerequisites = "console = {log: print,warn: print, error: print};Console = {log: print,warn: print, error: print};"; //adds console functional to engine
-	static Console console;
+	private String prerequisites = "console = {log: print,warn: print, error: print};Console = {log: print,warn: print, error: print};"; //adds console functional to engine
+	private Console console;
 	JTextPane textPane;
+	StringWriter stringWriter = new StringWriter();
 	
 	public Scripter(Console consoleToSet, JTextPane textPaneToSet) {
 		console = consoleToSet;
 		textPane = textPaneToSet;
 	}
 	public void executeAndOutput(String code, Color errorColor){ //executes code and outputs to console
-		StringWriter stringWriter = new StringWriter();
+		stringWriter.getBuffer().setLength(0);
 		engine.getContext().setWriter(stringWriter);
-		
 		try {
 			engine.eval(prerequisites+code);
 			console.displayLine("\n"+stringWriter, Color.white);

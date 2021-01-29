@@ -1,29 +1,42 @@
 package app;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IndexFinder {
+	private HashMap<String, Pattern> patternMap = new HashMap<String, Pattern>();
+	private Matcher matcher;
+	private Pattern pattern;
+	private ArrayList<Integer> foundIndexes = new ArrayList<Integer>();
+	private ArrayList<int[]> foundIndexesFromTo = new ArrayList<int[]>();
+	
 	public ArrayList<Integer> getIndexes(String teststring, String tofind){
-		ArrayList<Integer> foundIndexes = new ArrayList<Integer>();
+		foundIndexes.clear();
 		
 		//checks if the text starts with tofind
-		Pattern pattern = Pattern.compile("^"+tofind+"\\W");
-	    Matcher matcher =  pattern.matcher(teststring);
+	    matcher =  getPattern("^"+tofind+"\\W").matcher(teststring);
 	    while (matcher.find()) {
 	        foundIndexes.add(matcher.start());
 	    }
 		
 	    //checks if the text contains [non-word]tofind[non-word]
-		pattern = Pattern.compile("(?=(\\W"+tofind+"\\W))");
-		matcher = pattern.matcher(teststring);
+		matcher = getPattern("(?=(\\W"+tofind+"\\W))").matcher(teststring);
 	    
 	    while (matcher.find()) {
 	        foundIndexes.add(matcher.start() + 1);
 	    }
 	    
 	    return foundIndexes;
+	}
+	private Pattern getPattern(String regex) {
+		pattern = patternMap.get(regex);
+		if(pattern == null) {
+			pattern = Pattern.compile(regex);
+			patternMap.put(regex, pattern);
+		}
+		return pattern;
 	}
 	public int getCount(String teststring, String tofind){
 		int count = 0;
@@ -35,7 +48,8 @@ public class IndexFinder {
 		return count;
 	}
 	public ArrayList<int[]> findFromTo(String teststring, String from, String to, boolean DoNewlinesCount, int startoffset, int endoffset) {
-		ArrayList<int[]> foundIndexes = new ArrayList<int[]>();
+		int[] match = {0,0};
+		foundIndexesFromTo.clear();
 		
 		String anyChar;
 		if(DoNewlinesCount) {
@@ -44,15 +58,14 @@ public class IndexFinder {
 			anyChar = ".";
 		}
 		
-		Pattern pattern = Pattern.compile(from+"("+anyChar+"*?)"+to);
-		Matcher matcher = pattern.matcher(teststring);
+		matcher = getPattern(from+"("+anyChar+"*?)"+to).matcher(teststring);
 	    
 	    while (matcher.find()) {
-	    	int[] match = {matcher.start()+startoffset, matcher.end()+endoffset};
-	    	foundIndexes.add(match);
+	    	match[0] = matcher.start()+startoffset;
+	    	match[1] = matcher.end()+endoffset;
+	    	foundIndexesFromTo.add(match);
 	    }
-	    
-	    return foundIndexes;
+	    return foundIndexesFromTo;
 	}
 	public ArrayList<int[]> findFromTo(String teststring, String from, String to) {
 		return findFromTo(teststring, from, to, true, 0, 0);
