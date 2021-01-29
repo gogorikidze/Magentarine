@@ -37,6 +37,7 @@ public class FileManager {
 	    				file += (char)r;
 	    			}
 	    			editorPane.setText(file);
+	    			fis.close();
 	    		}catch(Exception e) {
 	    			System.out.print("Error wih reading"+e);
 	    		}

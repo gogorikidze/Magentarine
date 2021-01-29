@@ -6,13 +6,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IndexFinder {
-	HashMap<String, Pattern> patternMap = new HashMap<String, Pattern>();
+	private HashMap<String, Pattern> patternMap = new HashMap<String, Pattern>();
+	private Matcher matcher;
+	private Pattern pattern;
+	private ArrayList<Integer> foundIndexes = new ArrayList<Integer>();
+	private ArrayList<int[]> foundIndexesFromTo = new ArrayList<int[]>();
 	
 	public ArrayList<Integer> getIndexes(String teststring, String tofind){
-		ArrayList<Integer> foundIndexes = new ArrayList<Integer>();
+		foundIndexes.clear();
 		
 		//checks if the text starts with tofind
-	    Matcher matcher =  getPattern("^"+tofind+"\\W").matcher(teststring);
+	    matcher =  getPattern("^"+tofind+"\\W").matcher(teststring);
 	    while (matcher.find()) {
 	        foundIndexes.add(matcher.start());
 	    }
@@ -26,8 +30,8 @@ public class IndexFinder {
 	    
 	    return foundIndexes;
 	}
-	public Pattern getPattern(String regex) {
-		Pattern pattern = patternMap.get(regex);
+	private Pattern getPattern(String regex) {
+		pattern = patternMap.get(regex);
 		if(pattern == null) {
 			pattern = Pattern.compile(regex);
 			patternMap.put(regex, pattern);
@@ -44,7 +48,8 @@ public class IndexFinder {
 		return count;
 	}
 	public ArrayList<int[]> findFromTo(String teststring, String from, String to, boolean DoNewlinesCount, int startoffset, int endoffset) {
-		ArrayList<int[]> foundIndexes = new ArrayList<int[]>();
+		int[] match = {0,0};
+		foundIndexesFromTo.clear();
 		
 		String anyChar;
 		if(DoNewlinesCount) {
@@ -53,14 +58,14 @@ public class IndexFinder {
 			anyChar = ".";
 		}
 		
-		Matcher matcher = getPattern(from+"("+anyChar+"*?)"+to).matcher(teststring);
+		matcher = getPattern(from+"("+anyChar+"*?)"+to).matcher(teststring);
 	    
 	    while (matcher.find()) {
-	    	int[] match = {matcher.start()+startoffset, matcher.end()+endoffset};
-	    	foundIndexes.add(match);
+	    	match[0] = matcher.start()+startoffset;
+	    	match[1] = matcher.end()+endoffset;
+	    	foundIndexesFromTo.add(match);
 	    }
-	    
-	    return foundIndexes;
+	    return foundIndexesFromTo;
 	}
 	public ArrayList<int[]> findFromTo(String teststring, String from, String to) {
 		return findFromTo(teststring, from, to, true, 0, 0);

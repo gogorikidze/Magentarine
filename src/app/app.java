@@ -22,7 +22,6 @@ import javax.swing.undo.UndoManager;
 
 import java.awt.Window.Type;
 import java.awt.Color;
-import java.awt.Dimension;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -31,11 +30,10 @@ import java.awt.Label;
 import javax.swing.JTextArea;
 
 public class app {
-	FileManager fileManager = new FileManager();
-    ColorHighlighter highlighter;
-    Console console;
-    Theme theme = new Theme();
-    UndoManager undoManager;
+	private FileManager fileManager = new FileManager();
+	private ColorHighlighter highlighter;
+	private Theme theme = new Theme();
+	private UndoManager undoManager;
 	
 	private JFrame WindowFrame;
 	public static void main(String[] args) {
@@ -71,10 +69,6 @@ public class app {
 		textPane.setBounds(0, 0, WindowFrame.getWidth() - 20, 100);
 		textPane.setMargin(new Insets(0,5,0,5));
 		
-		JTextPane bufferPane = new JTextPane();
-		textPane.setBounds(0, 0, 0, 0);
-		WindowFrame.getContentPane().add(bufferPane);
-		
 		undoManager = new UndoManager();
 		textPane.getDocument().addUndoableEditListener(undoManager);
 		
@@ -96,10 +90,10 @@ public class app {
 		lineDisplay.setForeground(theme.fontColor);
 		lineDisplay.setBackground(theme.backgroundColor);
 		lineDisplay.setText("1");
-		lineDisplay.setSize(new Dimension(Math.max(lineDisplay.getPreferredSize().width, 20), lineDisplay.getWidth()));
+		lineDisplay.setSize(Math.max(lineDisplay.getPreferredSize().width, 20), lineDisplay.getWidth());
 		
 		String lineText = "1";
-		for(int i = 1; i < 5000; i++) { lineText += "\n" + (i+1);}
+		for(int i = 1; i < 3000; i++) { lineText += "\n" + (i+1);}
 		lineDisplay.setText(lineText);
 		lineDisplay.setSize(Math.max(20, lineDisplay.getPreferredSize().width), lineDisplay.getHeight());
 		
@@ -135,7 +129,7 @@ public class app {
 		
 		topMenuSetup(textPane);
 		
-		highlighter = new ColorHighlighter(textPane, bufferPane);
+		highlighter = new ColorHighlighter(textPane);
 		Console console = new Console(consoleArea);
 		Scripter scripter = new Scripter(console, textPane);
 		
@@ -166,12 +160,9 @@ public class app {
 		
 		nashornEngineVersion.setBounds(0, headerHeight+editorHeight, WindowFrame.getWidth(), nashornEngineVersion.getHeight());
 		lineScrollPane.setBounds(0, headerHeight, lineDisplay.getWidth(), editorHeight);
-		lineDisplay.setSize(new Dimension(Math.max(lineDisplay.getPreferredSize().width, 20), lineDisplay.getWidth()));
+		lineDisplay.setSize(Math.max(lineDisplay.getPreferredSize().width, 20), lineDisplay.getWidth());
 		scrollPane.setBounds(lineScrollPane.getWidth(), headerHeight, WindowFrame.getWidth()-15 - lineScrollPane.getWidth(), editorHeight);
 		consoleScrollPane.setBounds(0, headerHeight + editorHeight+ nashornEngineVersion.getHeight(), WindowFrame.getWidth()-15, consoleHeight);
-		
-		consoleScrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
-		scrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
 	}
 	void topMenuSetup(JTextPane textPane){
 		JMenuBar menuBar = new JMenuBar();
