@@ -9,10 +9,9 @@ public class IndexFinder {
 	private HashMap<String, Pattern> patternMap = new HashMap<String, Pattern>();
 	private Matcher matcher;
 	private Pattern pattern;
-	private ArrayList<Integer> foundIndexes = new ArrayList<Integer>();
-	private ArrayList<int[]> foundIndexesFromTo = new ArrayList<int[]>();
 	
 	public ArrayList<Integer> getIndexes(String teststring, String tofind){
+		ArrayList<Integer> foundIndexes = new ArrayList<Integer>();
 		foundIndexes.clear();
 		
 		//checks if the text starts with tofind
@@ -48,7 +47,8 @@ public class IndexFinder {
 		return count;
 	}
 	public ArrayList<int[]> findFromTo(String teststring, String from, String to, boolean DoNewlinesCount, int startoffset, int endoffset) {
-		int[] match = {0,0};
+		ArrayList<int[]> foundIndexesFromTo = new ArrayList<int[]>();
+		
 		foundIndexesFromTo.clear();
 		
 		String anyChar;
@@ -61,8 +61,7 @@ public class IndexFinder {
 		matcher = getPattern(from+"("+anyChar+"*?)"+to).matcher(teststring);
 	    
 	    while (matcher.find()) {
-	    	match[0] = matcher.start()+startoffset;
-	    	match[1] = matcher.end()+endoffset;
+	    	int[] match = {matcher.start()+startoffset, matcher.end()+endoffset};
 	    	foundIndexesFromTo.add(match);
 	    }
 	    return foundIndexesFromTo;
