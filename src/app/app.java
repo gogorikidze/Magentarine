@@ -5,6 +5,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -34,6 +36,7 @@ public class app {
 	private ColorHighlighter highlighter;
 	private Theme theme = new Theme();
 	private UndoManager undoManager;
+	private Timer timer = new Timer();
 	
 	private JFrame WindowFrame;
 	public static void main(String[] args) {
@@ -141,8 +144,15 @@ public class app {
 		
 		textPane.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
-				scripter.executeAndOutput(textPane.getText(), theme.errorColor);
-				highlighter.highlight(textPane, theme);
+				timer.cancel();
+				timer.purge();
+				timer = new Timer();
+				timer.schedule(new TimerTask() {
+		            @Override public void run() {
+		            	scripter.executeAndOutput(textPane.getText(), theme.errorColor);
+						highlighter.highlight(textPane, theme);
+		            }
+		        }, 700);
 			}
 		});
 		
