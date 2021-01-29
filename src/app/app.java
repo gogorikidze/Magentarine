@@ -5,11 +5,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.Timer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,7 +35,6 @@ public class app {
 	private ColorHighlighter highlighter;
 	private Theme theme = new Theme();
 	private UndoManager undoManager;
-	private Timer timer = new Timer();
 	
 	private JFrame WindowFrame;
 	public static void main(String[] args) {
@@ -142,17 +140,18 @@ public class app {
 		
 		nashornEngineVersion.setText("Nashorn Engine (v" + Scripter.engine.getFactory().getEngineVersion() + ") output:");
 		
+		
+		Timer timer = new Timer(300, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				scripter.executeAndOutput(textPane.getText(), theme.errorColor);
+				highlighter.highlight(textPane, theme);
+				((Timer)evt.getSource()).stop();
+			}
+		});
 		textPane.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
-				timer.cancel();
-				timer.purge();
-				timer = new Timer();
-				timer.schedule(new TimerTask() {
-		            @Override public void run() {
-		            	scripter.executeAndOutput(textPane.getText(), theme.errorColor);
-						highlighter.highlight(textPane, theme);
-		            }
-		        }, 700);
+				timer.restart();
 			}
 		});
 		
