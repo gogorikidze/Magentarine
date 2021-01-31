@@ -35,6 +35,7 @@ public class app {
 	private ColorHighlighter highlighter;
 	private Theme theme = new Theme();
 	private UndoManager undoManager;
+	private InputManager inputManager;
 	
 	private JFrame WindowFrame;
 	public static void main(String[] args) {
@@ -133,6 +134,7 @@ public class app {
 		highlighter = new ColorHighlighter(textPane);
 		Console console = new Console(consoleArea);
 		Scripter scripter = new Scripter(console, textPane);
+		inputManager = new InputManager(textPane);
 		
 		Label nashornEngineVersion = new Label("Nashorn Engine");
 		nashornEngineVersion.setBounds(0, 120, 584, 12);
@@ -151,6 +153,7 @@ public class app {
 		});
 		textPane.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
+				inputManager.input(e.getKeyChar());
 				timer.restart();
 			}
 		});

@@ -91,11 +91,4 @@ public class ColorHighlighter {
 			e.printStackTrace();
 		}
 	}
-	/*
-	public String customString(int length) {
-		char[] symbols = new char[length];
-		Arrays.fill(symbols, '*');
-		return new String(symbols);
-	}
-	*/
 }
