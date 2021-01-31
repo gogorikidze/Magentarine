@@ -160,21 +160,19 @@ public class app {
 		
 		ComponentListener windowComponentListener = new ComponentListener(){
 			public void componentResized(ComponentEvent arg0) {
-				resize(nashornEngineVersion,lineScrollPane,lineDisplay,scrollPane,consoleScrollPane);
+				int headerHeight = 0;
+				int consoleHeight = 150;
+				int editorHeight = WindowFrame.getContentPane().getHeight() - consoleHeight - headerHeight - nashornEngineVersion.getHeight();
+				
+				nashornEngineVersion.setBounds(0, headerHeight+editorHeight, WindowFrame.getWidth(), nashornEngineVersion.getHeight());
+				lineScrollPane.setBounds(0, headerHeight, lineDisplay.getWidth(), editorHeight);
+				lineDisplay.setSize(Math.max(lineDisplay.getPreferredSize().width, 20), lineDisplay.getWidth());
+				scrollPane.setBounds(lineScrollPane.getWidth(), headerHeight, WindowFrame.getWidth()-15 - lineScrollPane.getWidth(), editorHeight);
+				textPane.setSize(WindowFrame.getWidth()-15 - lineScrollPane.getWidth(), editorHeight);
+				consoleScrollPane.setBounds(0, headerHeight + editorHeight+ nashornEngineVersion.getHeight(), WindowFrame.getWidth()-15, consoleHeight);
 		    }@Override public void componentHidden(ComponentEvent e) {}@Override public void componentMoved(ComponentEvent e) {}@Override public void componentShown(ComponentEvent e) {}
 		};
 		WindowFrame.addComponentListener(windowComponentListener);
-	}
-	void resize(Label nashornEngineVersion, JScrollPane lineScrollPane, JTextArea lineDisplay, JScrollPane scrollPane, JScrollPane consoleScrollPane) {
-		int headerHeight = 0;
-		int consoleHeight = 150;
-		int editorHeight = WindowFrame.getContentPane().getHeight() - consoleHeight - headerHeight - nashornEngineVersion.getHeight();
-		
-		nashornEngineVersion.setBounds(0, headerHeight+editorHeight, WindowFrame.getWidth(), nashornEngineVersion.getHeight());
-		lineScrollPane.setBounds(0, headerHeight, lineDisplay.getWidth(), editorHeight);
-		lineDisplay.setSize(Math.max(lineDisplay.getPreferredSize().width, 20), lineDisplay.getWidth());
-		scrollPane.setBounds(lineScrollPane.getWidth(), headerHeight, WindowFrame.getWidth()-15 - lineScrollPane.getWidth(), editorHeight);
-		consoleScrollPane.setBounds(0, headerHeight + editorHeight+ nashornEngineVersion.getHeight(), WindowFrame.getWidth()-15, consoleHeight);
 	}
 	void topMenuSetup(JTextPane textPane){
 		JMenuBar menuBar = new JMenuBar();
